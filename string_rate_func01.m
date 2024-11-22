@@ -1,4 +1,3 @@
-
 %INPUTS
 %t: current time
 %V: system state. V = [U;dUdt] where
@@ -27,7 +26,7 @@ dUdt = V((n+1):(2*n));
 Uf = Uf_func(t);
 dUfdt = dUfdt_func(t);
 %compute acceleration
-d2Udt2 = zeros(1,n);
+d2Udt2 = zeros(n,1);
 for i = 1:n
     if i == 1
         d2Udt2(i) = n/M*Tf/dx*(0-2*U(i)+U(i+1))+c/dx*(0-2*dUdt(i)+dUdt(i+1));
@@ -40,4 +39,3 @@ end
 %assemble state derivative
 dVdt = [dUdt;d2Udt2];
 end
-
