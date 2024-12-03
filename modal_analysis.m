@@ -1,4 +1,5 @@
 clear
+
 % Define variables
 num_masses = 3;
 total_mass = 2;
@@ -31,9 +32,16 @@ string_params.dx = dx;
 % lambda_mat
 [Ur_mat,lambda_mat] = eig(K_mat,M_mat);
 
-
 % calculate frequencies
 frequency_mat = lambda_mat.^(1/2);
+
+% Mode 1
+omega_mat1 = frequency_mat(1,1);
+mode1 = Ur_mat(:,1);
+epsilon = 0.5;
+V01 = V_eq + epsilon*[mode1;0;0;0];
+
+
 
 string_simulation_02(num_masses, total_mass, tension_force,...
     string_length, damping_coeff, dx, norm(frequency_mat(1,:)),frequency_mat(1,1))
