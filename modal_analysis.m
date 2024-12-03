@@ -31,6 +31,7 @@ string_params.dx = dx;
 % lambda_mat
 [Ur_mat,lambda_mat] = eig(K_mat,M_mat);
 
+
 % calculate frequencies
 frequency_mat = lambda_mat.^(1/2);
 

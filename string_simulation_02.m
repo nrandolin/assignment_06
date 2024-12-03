@@ -42,13 +42,13 @@ function string_simulation_template02(wave_func_in,wave_func_derivative)
 
     figure(1);
     axis manual;
-    for t = 1:length(tlist)
+    for i = 1:length(tlist)
 %         for mass_num = 1:length(Vlist(1,:))/2
             x_pos = dx.*[1:1:num_masses];
-            position_of_masses = Vlist(t,1:num_masses);
+            position_of_masses = Vlist(i,1:num_masses);
             hold on;
-            c = sqrt(tension_force/(total_mass/num_masses));
-            x = string_length-c*t+.5*w*c;
+            c = sqrt(tension_force/(total_mass/string_length));
+            x = string_length-c*tlist(i)+.5*w*c;
             x = mod(x,2*string_length);
             if x > string_length
                 x = 2*string_length - x;
@@ -57,11 +57,9 @@ function string_simulation_template02(wave_func_in,wave_func_derivative)
             ylim([-15,15]);
             xlim([-0,5000])
             plot(x_pos,position_of_masses,"b.","MarkerSize",20);
-            plot(max(x_pos)+dx,Uf_func(tlist(t)),"r.","MarkerSize",20);
+            plot(max(x_pos)+dx,Uf_func(tlist(i)),"r.","MarkerSize",20);
             plot(0,0,"r.","MarkerSize",20);
             plot(x_pos,position_of_masses,"b-");
-            %x = x-coord of tracking line, t = current time
-            %c = wave speed, w = pulse width (in time)
 ;
 %         end
         pause(0.001);
