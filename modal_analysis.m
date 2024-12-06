@@ -1,8 +1,8 @@
 clear
 
 % Define variables
-num_masses = 4;
-total_mass = 2;
+num_masses = 15;
+total_mass = 30;
 tension_force = 8;
 string_length = 3;
 damping_coeff = 0.1;
@@ -36,7 +36,7 @@ string_params.dx = dx;
 frequency_mat = lambda_mat.^(1/2);
 
 % Mode 1
-mode_num = 3;
+mode_num = 5;
 omega_mat = frequency_mat(mode_num,mode_num);
 mode = Ur_mat(:,mode_num);
 amplitude_mat = norm(frequency_mat(:,mode_num));
@@ -111,6 +111,7 @@ function string_simulation_02(num_masses, total_mass, tension_force,...
     (my_rate_func,tspan,V0,h_ref,ralston_struct);
     
     figure(1);
+
     axis manual;
     for i = 1:length(tlist)
 %         for mass_num = 1:length(Vlist(1,:))/2
@@ -126,10 +127,33 @@ function string_simulation_02(num_masses, total_mass, tension_force,...
             hold on;
             plot(x_pos_all,position_of_masses_all,"b-");
             ylim([-15,15]);
+            xlabel("X")
+            ylabel("Y")
+            title("Mode Shape Wave Animation")
 %         end
         pause(0.1);
         clf;
     end
+
+    figure(2);
+    axis manual;
+    i = 100;
+        x_pos = dx.*[1:1:num_masses];
+        position_of_masses = Vlist(i,1:num_masses);
+        plot(x_pos,position_of_masses,"b.","MarkerSize",20);
+        hold on;
+        plot(max(x_pos)+dx,Uf_func(tlist(i)),"r.","MarkerSize",20);
+        hold on;
+        plot(0,0,"r.","MarkerSize",20);
+        x_pos_all = [0, x_pos, max(x_pos)+dx];
+        position_of_masses_all = [0, position_of_masses, Uf_func(tlist(i))];
+        hold on;
+        plot(x_pos_all,position_of_masses_all,"b-");
+        ylim([-15,15]);
+        xlabel("X")
+        ylabel("Y")
+        title("Mode Shape")
+
 end
 %% explicit_RK fixed_step integrator
 %Runs numerical integration arbitrary RK method
