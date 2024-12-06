@@ -1,6 +1,7 @@
 %% simulation
 clear;
 string_simulation_template02(@triangle_pulse,@triangle_pulse_derivative)
+string_simulation_template02(@b_spline_pulse,@b_spline_pulse_derivative)
 
 function string_simulation_template02(wave_func_in,wave_func_derivative)
     num_masses = 300;
