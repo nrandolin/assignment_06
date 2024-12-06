@@ -1,11 +1,11 @@
 clear
 
 % Define variables
-num_masses = 3;
+num_masses = 4;
 total_mass = 2;
 tension_force = 8;
 string_length = 3;
-damping_coeff = 1;
+damping_coeff = 0.1;
 dx = string_length/(num_masses+1);
 amplitude_Uf = 1;
 omega_Uf = 2*pi();
@@ -36,15 +36,15 @@ string_params.dx = dx;
 frequency_mat = lambda_mat.^(1/2);
 
 % Mode 1
-omega_mat1 = frequency_mat(1,1);
-mode1 = Ur_mat(:,1);
-epsilon = 0.5;
-V01 = V_eq + epsilon*[mode1;0;0;0];
+mode_num = 3;
+omega_mat = frequency_mat(mode_num,mode_num);
+mode = Ur_mat(:,mode_num);
+amplitude_mat = norm(frequency_mat(:,mode_num));
 
-
+% note: if a mode doesn't seem to be resonating, check damping coeff
 
 string_simulation_02(num_masses, total_mass, tension_force,...
-    string_length, damping_coeff, dx, norm(frequency_mat(1,:)),frequency_mat(1,1))
+    string_length, damping_coeff, dx, amplitude_mat,omega_mat)
 
 %% ematrix cals
 %build the mass and stiffness matrices that describe the 2nd order system.
@@ -99,7 +99,7 @@ function string_simulation_02(num_masses, total_mass, tension_force,...
     U0 = zeros(num_masses,1);
     dUdt0 = zeros(num_masses,1);
     V0 = [U0;dUdt0];
-    tspan = [0,5];
+    tspan = [0,10];
     %run the integration
     ralston_struct.A = [0, 0, 0; 0.5, 0, 0; 0, 0.75, 0];
     ralston_struct.B = [2/9, 1/3, 4/9];
@@ -112,16 +112,20 @@ function string_simulation_02(num_masses, total_mass, tension_force,...
     
     figure(1);
     axis manual;
-    for t = 1:length(tlist)
+    for i = 1:length(tlist)
 %         for mass_num = 1:length(Vlist(1,:))/2
             x_pos = dx.*[1:1:num_masses];
-            position_of_masses = Vlist(t,1:num_masses);
-            hold on;
+            position_of_masses = Vlist(i,1:num_masses);
             plot(x_pos,position_of_masses,"b.","MarkerSize",20);
-            plot(max(x_pos)+dx,Uf_func(tlist(t)),"r.","MarkerSize",20);
+            hold on;
+            plot(max(x_pos)+dx,Uf_func(tlist(i)),"r.","MarkerSize",20);
+            hold on;
             plot(0,0,"r.","MarkerSize",20);
-            plot(x_pos,position_of_masses,"b-");
-            ylim([-5,5]);
+            x_pos_all = [0, x_pos, max(x_pos)+dx];
+            position_of_masses_all = [0, position_of_masses, Uf_func(tlist(i))];
+            hold on;
+            plot(x_pos_all,position_of_masses_all,"b-");
+            ylim([-15,15]);
 %         end
         pause(0.1);
         clf;

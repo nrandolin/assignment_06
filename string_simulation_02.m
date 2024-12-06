@@ -59,7 +59,10 @@ function string_simulation_template02(wave_func_in,wave_func_derivative)
             plot(x_pos,position_of_masses,"b.","MarkerSize",20);
             plot(max(x_pos)+dx,Uf_func(tlist(i)),"r.","MarkerSize",20);
             plot(0,0,"r.","MarkerSize",20);
-            plot(x_pos,position_of_masses,"b-");
+            x_pos_all = [0, x_pos, max(x_pos)+dx];
+            position_of_masses_all = [0, position_of_masses, Uf_func(tlist(i))];
+            hold on;
+            plot(x_pos_all,position_of_masses_all,"b-");
 ;
 %         end
         pause(0.001);

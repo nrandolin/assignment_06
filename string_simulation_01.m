@@ -42,16 +42,20 @@ function string_simulation_template01()
     
     figure(1);
     axis manual;
-    for t = 1:length(tlist)
+    for i = 1:length(tlist)
 %         for mass_num = 1:length(Vlist(1,:))/2
             x_pos = dx.*[1:1:num_masses];
-            position_of_masses = Vlist(t,1:num_masses);
-            hold on;
+            position_of_masses = Vlist(i,1:num_masses);
             plot(x_pos,position_of_masses,"b.","MarkerSize",20);
-            plot(max(x_pos)+dx,Uf_func(tlist(t)),"r.","MarkerSize",20);
+            hold on;
+            plot(max(x_pos)+dx,Uf_func(tlist(i)),"r.","MarkerSize",20);
+            hold on;
             plot(0,0,"r.","MarkerSize",20);
-            plot(x_pos,position_of_masses,"b-");
-            ylim([-5,5]);
+            x_pos_all = [0, x_pos, max(x_pos)+dx];
+            position_of_masses_all = [0, position_of_masses, Uf_func(tlist(i))];
+            hold on;
+            plot(x_pos_all,position_of_masses_all,"b-");
+            ylim([-15,15]);
 %         end
         pause(0.1);
         clf;
