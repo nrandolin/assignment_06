@@ -36,15 +36,15 @@ string_params.dx = dx;
 frequency_mat = lambda_mat.^(1/2);
 
 % Mode 1
-mode_num = 5;
+mode_num = 2;
 omega_mat = frequency_mat(mode_num,mode_num);
 mode = Ur_mat(:,mode_num);
-amplitude_mat = norm(frequency_mat(:,mode_num));
+%amplitude_mat = norm(frequency_mat(:,mode_num));
 
 % note: if a mode doesn't seem to be resonating, check damping coeff
 
 string_simulation_02(num_masses, total_mass, tension_force,...
-    string_length, damping_coeff, dx, amplitude_mat,omega_mat)
+    string_length, damping_coeff, dx, 5,omega_mat)
 
 %% ematrix cals
 %build the mass and stiffness matrices that describe the 2nd order system.
