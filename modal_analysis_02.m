@@ -40,26 +40,33 @@ function output_list = modal_analysis_2()
     U0 = zeros(num_masses,1);
     dUdt0 = zeros(num_masses,1);
     V0 = [U0;dUdt0];
-    tspan = [0,75];
+    tspan = [0,1];
+    x_pos = dx.*[1:1:num_masses]
+    x_pos = [0, x_pos, 3]
 
     c = sqrt(string_params.Tf/(total_mass/string_params.L));
     num_frequencies = 10;
     Bn = 5;
     n = transpose(1:num_frequencies);
     frequencies = pi*n/string_params.L;
-    resonant_frequencies = c*pi*n/string_params.L
-    mode_shapes = zeros(num_frequencies,1);
-    for x = 1:(string_params.L-1)/10:string_params.L
-        mode_shapes(:,end+1) = Bn*sin(pi*n*x/string_params.L);
+    resonant_frequencies = c*pi*n/string_params.L;
+    mode_shapes = ones(num_frequencies,1);
+    for i = 1:length(x_pos)
+        mode_shapes(:,end+1) = Bn*sin(pi*n.*x_pos(i)/string_params.L);
     end
     amplitude_Uf = 5;
-
+    mode_shapes = mode_shapes(:,2:end)
     output_list = [mode_shapes,resonant_frequencies, frequencies];
-    string_simulation_02(num_masses, total_mass, tension_force,...
-    string_length, damping_coeff, dx,amplitude_Uf,frequencies(2,1))
+    %string_simulation_02(num_masses, total_mass, tension_force,...
+    %string_length, damping_coeff, dx,amplitude_Uf,frequencies(2,1))
     figure();
     plot(n, resonant_frequencies, '.b', 'MarkerSize', 8)
     title("Resonant Frequency vs. n")
+    hold off
+    figure();
+    plot(x_pos, mode_shapes(2,:), '.r', 'MarkerSize', 20)
+    hold on
+    plot(x_pos, mode_shapes(2,:), '-b')
 end
 
 %%

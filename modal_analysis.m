@@ -7,7 +7,7 @@ tension_force = 8;
 string_length = 3;
 damping_coeff = 0.1;
 dx = string_length/(num_masses+1);
-amplitude_Uf = 1;
+amplitude_Uf = 5;
 omega_Uf = 2*pi();
 %list of x points (including the two endpoints)
 xlist = linspace(0,string_length,num_masses+2);
@@ -36,7 +36,7 @@ string_params.dx = dx;
 frequency_mat = lambda_mat.^(1/2);
 
 % Mode 1
-mode_num = 2;
+mode_num = 4;
 omega_mat = frequency_mat(mode_num,mode_num);
 mode = Ur_mat(:,mode_num);
 %amplitude_mat = norm(frequency_mat(:,mode_num));
@@ -44,7 +44,7 @@ mode = Ur_mat(:,mode_num);
 % note: if a mode doesn't seem to be resonating, check damping coeff
 
 string_simulation_02(num_masses, total_mass, tension_force,...
-    string_length, damping_coeff, dx, 5,omega_mat)
+    string_length, damping_coeff, dx, 5,omega_mat, mode)
 
 %% ematrix cals
 %build the mass and stiffness matrices that describe the 2nd order system.
@@ -80,7 +80,7 @@ end
 % my_Laplacian(n,1) = 0;
 %Use MATLAB to solve the generalized eigenvalue problem
 function string_simulation_02(num_masses, total_mass, tension_force,...
-    string_length, damping_coeff, dx,amplitude_Uf,omega_Uf)
+    string_length, damping_coeff, dx,amplitude_Uf,omega_Uf, mode_shape)
     %list of x points (including the two endpoints)
     xlist = linspace(0,string_length,num_masses+2);
     Uf_func = @(t_in) amplitude_Uf*cos(omega_Uf*t_in);
@@ -112,32 +112,27 @@ function string_simulation_02(num_masses, total_mass, tension_force,...
     
     figure(1);
 
+
+    
     axis manual;
     for i = 1:length(tlist)
-%         for mass_num = 1:length(Vlist(1,:))/2
-            x_pos = dx.*[1:1:num_masses];
-            position_of_masses = Vlist(i,1:num_masses);
-            plot(x_pos,position_of_masses,"b.","MarkerSize",20);
-            hold on;
-            plot(max(x_pos)+dx,Uf_func(tlist(i)),"r.","MarkerSize",20);
-            hold on;
-            plot(0,0,"r.","MarkerSize",20);
-            x_pos_all = [0, x_pos, max(x_pos)+dx];
-            position_of_masses_all = [0, position_of_masses, Uf_func(tlist(i))];
-            hold on;
-            plot(x_pos_all,position_of_masses_all,"b-");
-            ylim([-15,15]);
-            xlabel("X")
-            ylabel("Y")
-            title("Mode Shape Wave Animation")
-%         end
-        pause(0.1);
-        clf;
-    end
-
-    figure(2);
-    axis manual;
-    i = 100;
+        subplot(2,1,1)
+        hold off
+        axis manual;
+        x_pos = dx.*[1:1:num_masses];
+        plot(x_pos,mode_shape,"b.","MarkerSize",20);
+        hold on;
+        plot(string_params.L, 0,"r.","MarkerSize",20);
+        hold on;
+        plot(0,0,"r.","MarkerSize",20);
+        x_pos_all = [0, x_pos, string_params.L];
+        position_of_masses_all = [0, mode_shape', 0];
+        hold on;
+        plot(x_pos_all,position_of_masses_all,"b-");
+        xlabel("X")
+        ylabel("Y")
+        title("Mode Shape")
+        subplot(2,1,2)
         x_pos = dx.*[1:1:num_masses];
         position_of_masses = Vlist(i,1:num_masses);
         plot(x_pos,position_of_masses,"b.","MarkerSize",20);
@@ -152,7 +147,10 @@ function string_simulation_02(num_masses, total_mass, tension_force,...
         ylim([-15,15]);
         xlabel("X")
         ylabel("Y")
-        title("Mode Shape")
+        title("Mode Shape Wave Animation")
+        pause(0.1);
+        clf;
+    end
 
 end
 %% explicit_RK fixed_step integrator
