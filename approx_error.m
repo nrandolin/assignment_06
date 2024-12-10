@@ -1,51 +1,5 @@
 % MODAL ANALYSIS FOR CONTINUOUS INPUT
 clear all;
-%% DISCRETE
-% Define variables
-num_masses = 15;
-total_mass = 30;
-tension_force = 8;
-string_length = 3;
-damping_coeff = 0.1;
-dx = string_length/(num_masses+1);
-amplitude_Uf = 5;
-omega_Uf = 2*pi();
-%list of x points (including the two endpoints)
-xlist = linspace(0,string_length,num_masses+2);
-Uf_func = @(t_in) amplitude_Uf*cos(omega_Uf*t_in);
-dUfdt_func = @(t_in) -omega_Uf*amplitude_Uf*sin(omega_Uf*t_in);
-%generate the struct
-string_params = struct();
-string_params.n = num_masses;
-string_params.M = total_mass;
-string_params.Uf_func = Uf_func;
-string_params.dUfdt_func = dUfdt_func;
-string_params.Tf = tension_force;
-string_params.L = string_length;
-string_params.c = damping_coeff;
-string_params.dx = dx;
-
-% calculate inertia and stiffness matricies
-[M_mat,K_mat] = construct_2nd_order_matrices(string_params);
-
-% calculate eigen values/vactors
-% collums in ur_mat are the mode shape, which correspond eigenvalues in
-% lambda_mat
-[Ur_mat,lambda_mat] = eig(K_mat,M_mat);
-
-% calculate frequencies
-frequency_mat = lambda_mat.^(1/2);
-
-% Mode 1
-mode_num = 4;
-omega_mat = frequency_mat(mode_num,mode_num);
-mode = Ur_mat(:,mode_num);
-%amplitude_mat = norm(frequency_mat(:,mode_num));
-
-% note: if a mode doesn't seem to be resonating, check damping coeff
-
-%string_simulation_02(num_masses, total_mass, tension_force,...
-    %string_length, damping_coeff, dx, 5,omega_mat, mode)
 
 %% CONTINUOUS
 % call function
@@ -58,8 +12,13 @@ frequencies = output_list(mode_num, end);
 
 %% define function
 function output_list = modal_analysis_2()
+    discrete_freq = [];
+    continuous_freq = [];
+
+    for i = 1:10;
     % define parameters
-    num_masses = 100;
+    num_mass_list = linspace(10,1000,99);
+    num_masses = num_mass_list(i);
     total_mass = 30;
     tension_force = 8;
     string_length = 30;
@@ -68,7 +27,6 @@ function output_list = modal_analysis_2()
     w = 2;
     h = 10;
     %list of x points (including the two endpoints)
-    xlist = linspace(0,string_length,num_masses+2);
     Uf_func = @(t) wave_func_in(t,w,h);
     dUfdt_func = @(t) wave_func_derivative(t,w,h);
     %generate the struct
@@ -118,44 +76,18 @@ function output_list = modal_analysis_2()
     amplitude_Uf = 5;
     mode_shapes = mode_shapes(:,2:end);
     output_list = [mode_shapes,resonant_frequencies, frequencies];
-%     string_simulation_02(num_masses, total_mass, tension_force,...
-%     string_length, damping_coeff, dx, amplitude_Uf, frequencies(2,1))
-
     
-    % CONTINUOUS
-    figure();
-    plot(x_pos, mode_shapes(mode_num,:), '.b', 'MarkerSize', 20)
-    hold on
-    plot(x_pos, mode_shapes(mode_num,:), '-b')
-    hold on
 
-    % DISCRETE
-    mode = mode';
-    mode = mode*(norm(mode_shapes(mode_num,:))/norm(mode));
-    mode = mode*sign(mode_shapes(mode_num,2))/sign(mode(2));
-    x_pos = dx.*[1:1:num_masses];
-    plot(x_pos,mode,"og","MarkerSize",5);
-    hold on;
-    plot(string_params.L, 0,"og","MarkerSize",5);
-    hold on;
-    plot(0,0,"og","MarkerSize",5);
-    x_pos_all = [0, x_pos, string_params.L];
-    position_of_masses_all = [0, mode, 0];
-    hold on;
-    plot(x_pos_all,position_of_masses_all,"g-");
-    xlabel("X")
-    ylabel("Y")
-    title("Continuous vs. Discrete Mode Shape")
+    discrete_freq = [discrete_freq, omega_mat];
+    continuous_freq = [continuous_freq, resonant_frequencies(num_masses)];
+    
+    end
 
-    h = zeros(2, 1);
-    h(1) = plot(NaN,NaN,'.b', 'MarkerSize', 15);
-    h(2) = plot(NaN,NaN,'.g', 'MarkerSize', 15);
-    legend(h, 'Continuous','Discrete');
 
     % APPROX ERROR PLOT
-    approx_error = abs(resonant_frequencies(mode_num) - omega_mat)
+    approx_error = abs(continuous_freq - discrete_freq)
     figure();
-    semilogy(n, approx_error, '.b', 'MarkerSize', 20)
+    semilogy(num_mass_list, approx_error, '.b', 'MarkerSize', 20)
     xlabel("n")
     ylabel("Approximation Error")
     title("Resonant Frequency Approximation Error")
@@ -205,7 +137,6 @@ end
 function string_simulation_02(num_masses, total_mass, tension_force,...
     string_length, damping_coeff, dx,amplitude_Uf,omega_Uf, mode_shape)
     %list of x points (including the two endpoints)
-    xlist = linspace(0,string_length,num_masses+2);
     Uf_func = @(t_in) amplitude_Uf*cos(omega_Uf*t_in);
     dUfdt_func = @(t_in) -omega_Uf*amplitude_Uf*sin(omega_Uf*t_in);
     %generate the struct

@@ -59,7 +59,7 @@ frequencies = output_list(mode_num, end);
 %% define function
 function output_list = modal_analysis_2()
     % define parameters
-    num_masses = 100;
+    num_masses = 200;
     total_mass = 30;
     tension_force = 8;
     string_length = 30;
@@ -93,7 +93,7 @@ function output_list = modal_analysis_2()
     [M_mat,K_mat] = construct_2nd_order_matrices(string_params);
     
     % calculate eigen values/vactors
-    % columns in ur_mat are the mode shape, which correspond eigenvalues in
+    % collums in ur_mat are the mode shape, which correspond eigenvalues in
     % lambda_mat
     [Ur_mat,lambda_mat] = eig(K_mat,M_mat);
     
@@ -101,12 +101,12 @@ function output_list = modal_analysis_2()
     frequency_mat = lambda_mat.^(1/2);
     
     % Mode
-    mode_num = 7;
+    mode_num = 3;
     omega_mat = frequency_mat(mode_num,mode_num);
     mode = Ur_mat(:,mode_num);
 
     c = sqrt(string_params.Tf/(total_mass/string_params.L));
-    num_frequencies = num_masses;
+    num_frequencies = 10;
     Bn = 5;
     n = transpose(1:num_frequencies);
     frequencies = pi*n/string_params.L;
@@ -118,10 +118,13 @@ function output_list = modal_analysis_2()
     amplitude_Uf = 5;
     mode_shapes = mode_shapes(:,2:end);
     output_list = [mode_shapes,resonant_frequencies, frequencies];
-%     string_simulation_02(num_masses, total_mass, tension_force,...
-%     string_length, damping_coeff, dx, amplitude_Uf, frequencies(2,1))
+    string_simulation_02(num_masses, total_mass, tension_force,...
+    string_length, damping_coeff, dx, amplitude_Uf, frequencies(2,1))
+    figure();
+    plot(n, resonant_frequencies, '.b', 'MarkerSize', 8)
+    title("Resonant Frequency vs. n")
+    hold off
 
-    
     % CONTINUOUS
     figure();
     plot(x_pos, mode_shapes(mode_num,:), '.b', 'MarkerSize', 20)
@@ -132,7 +135,6 @@ function output_list = modal_analysis_2()
     % DISCRETE
     mode = mode';
     mode = mode*(norm(mode_shapes(mode_num,:))/norm(mode));
-    mode = mode*sign(mode_shapes(mode_num,2))/sign(mode(2));
     x_pos = dx.*[1:1:num_masses];
     plot(x_pos,mode,"og","MarkerSize",5);
     hold on;
@@ -152,20 +154,7 @@ function output_list = modal_analysis_2()
     h(2) = plot(NaN,NaN,'.g', 'MarkerSize', 15);
     legend(h, 'Continuous','Discrete');
 
-    % APPROX ERROR PLOT
-    approx_error = abs(resonant_frequencies(mode_num) - omega_mat)
-    figure();
-    semilogy(n, approx_error, '.b', 'MarkerSize', 20)
-    xlabel("n")
-    ylabel("Approximation Error")
-    title("Resonant Frequency Approximation Error")
-
-    figure();
-    plot(resonant_frequencies, '.b', 'MarkerSize', 20)
-    hold on
-    plot(diag(frequency_mat), '.g', 'MarkerSize', 20)
-    title("Resonant Frequency vs. n")
-    
+    omega_mat .- resonant_frequencies(mode_num)
 end
 
 %% ematrix cals
