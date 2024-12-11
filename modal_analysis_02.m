@@ -59,10 +59,10 @@ frequencies = output_list(mode_num, end);
 %% define function
 function output_list = modal_analysis_2()
     % define parameters
-    num_masses = 100;
-    total_mass = 30;
+    num_masses = 15;
+    total_mass = 5;
     tension_force = 8;
-    string_length = 30;
+    string_length = 5;
     damping_coeff = 0.1;
     dx = string_length/(num_masses+1);
     w = 2;
@@ -126,9 +126,9 @@ function output_list = modal_analysis_2()
     figure();
     plot(x_pos, mode_shapes(mode_num,:), '.b', 'MarkerSize', 20)
     hold on
-    plot(x_pos, mode_shapes(mode_num,:), '-b')
+    plot(x_pos, mode_shapes(mode_num,:), '-b', 'LineWidth', 1)
     hold on
-
+    
     % DISCRETE
     mode = mode';
     mode = mode*(norm(mode_shapes(mode_num,:))/norm(mode));
@@ -152,19 +152,14 @@ function output_list = modal_analysis_2()
     h(2) = plot(NaN,NaN,'.g', 'MarkerSize', 15);
     legend(h, 'Continuous','Discrete');
 
-    % APPROX ERROR PLOT
-    approx_error = abs(resonant_frequencies(mode_num) - omega_mat)
-    figure();
-    semilogy(n, approx_error, '.b', 'MarkerSize', 20)
-    xlabel("n")
-    ylabel("Approximation Error")
-    title("Resonant Frequency Approximation Error")
 
     figure();
     plot(resonant_frequencies, '.b', 'MarkerSize', 20)
     hold on
     plot(diag(frequency_mat), '.g', 'MarkerSize', 20)
     title("Resonant Frequency vs. n")
+    xlabel("Harmonic Index (n)")
+    ylabel("Resonant Frequency")
     
 end
 

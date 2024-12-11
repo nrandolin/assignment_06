@@ -14,10 +14,10 @@ frequencies = output_list(mode_num, end);
 function output_list = modal_analysis_2()
     discrete_freq = [];
     continuous_freq = [];
-
-    for i = 1:10;
+    num_mass_list = [10:20:2000];
+    for i = 1:length(num_mass_list);
     % define parameters
-    num_mass_list = linspace(10,1000,99);
+    
     num_masses = num_mass_list(i);
     total_mass = 30;
     tension_force = 8;
@@ -85,18 +85,12 @@ function output_list = modal_analysis_2()
 
 
     % APPROX ERROR PLOT
-    approx_error = abs(continuous_freq - discrete_freq)
+    approx_error = abs(continuous_freq - discrete_freq);
     figure();
     semilogy(num_mass_list, approx_error, '.b', 'MarkerSize', 20)
-    xlabel("n")
+    xlabel("Number of Masses")
     ylabel("Approximation Error")
     title("Resonant Frequency Approximation Error")
-
-    figure();
-    plot(resonant_frequencies, '.b', 'MarkerSize', 20)
-    hold on
-    plot(diag(frequency_mat), '.g', 'MarkerSize', 20)
-    title("Resonant Frequency vs. n")
     
 end
 

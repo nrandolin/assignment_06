@@ -1,7 +1,93 @@
+%%
+wave_func_in = @b_spline_pulse;
+wave_func_derivative = @b_spline_pulse_derivative;
+    
+num_masses = 300;
+total_mass = 2;
+tension_force = 5;
+string_length = 5000;
+damping_coeff = 0;
+dx = string_length/(num_masses+1);
+w = 2;
+h = 10;
+%list of x points (including the two endpoints)
+xlist = linspace(0,string_length,num_masses+2);
+Uf_func = @(t) wave_func_in(t,w,h);
+dUfdt_func = @(t) wave_func_derivative(t,w,h);
+%generate the struct
+string_params = struct();
+string_params.n = num_masses;
+string_params.M = total_mass;
+string_params.Uf_func = Uf_func;
+string_params.dUfdt_func = dUfdt_func;
+string_params.Tf = tension_force;
+string_params.L = string_length;
+string_params.c = damping_coeff;
+string_params.dx = dx;
+%initial conditions
+U0 = zeros(num_masses,1);
+dUdt0 = zeros(num_masses,1);
+V0 = [U0;dUdt0];
+tspan = [0,75];
+%run the integration
+ralston_struct.A = [0, 0, 0; 0.5, 0, 0; 0, 0.75, 0];
+ralston_struct.B = [2/9, 1/3, 4/9];
+ralston_struct.C = [0; 0.5; 0.75];
+h_ref = 0.1;
+my_rate_func = @(t,V) string_rate_func01(t,V,string_params);
+
+[tlist,Vlist, ~, ~] = explicit_RK_fixed_step_integration ...
+(my_rate_func,tspan,V0,h_ref,ralston_struct);
+
+mypath1 = 'C:\Users\ldao\Downloads\';
+fname='b_spline_pulse.avi';
+input_fname = [mypath1,fname];
+
+% create a videowriter, which will write frames to the animation file
+writerObj = VideoWriter(input_fname);
+
+% must call open before writing any frames
+open(writerObj);
+
+fig1 = figure(1);
+
+axis manual;
+for i = 1:length(tlist)
+%         for mass_num = 1:length(Vlist(1,:))/2
+        x_pos = dx.*[1:1:num_masses];
+        position_of_masses = Vlist(i,1:num_masses);
+        hold on;
+        c = sqrt(tension_force/(total_mass/string_length));
+        x = string_length-c*tlist(i)+.5*w*c;
+        x = mod(x,2*string_length);
+        if x > string_length
+            x = 2*string_length - x;
+        end
+        xline(x, '-');
+        ylim([-15,15]);
+        xlim([-0,5000])
+        plot(x_pos,position_of_masses,"b.","MarkerSize",20);
+        plot(max(x_pos)+dx,Uf_func(tlist(i)),"r.","MarkerSize",20);
+        plot(0,0,"r.","MarkerSize",20);
+        x_pos_all = [0, x_pos, max(x_pos)+dx];
+        position_of_masses_all = [0, position_of_masses, Uf_func(tlist(i))];
+        hold on;
+        plot(x_pos_all,position_of_masses_all,"b-");
+        title("Traveling Wave (B-Spline)")
+        xlabel("x")
+        ylabel("u")
+        drawnow;
+    current_frame = getframe(fig1);
+    writeVideo(writerObj,current_frame)
+    pause(0.001);
+    clf;
+end
+close(writerObj);
+
 %% simulation
 clear;
-string_simulation_template02(@triangle_pulse,@triangle_pulse_derivative)
-string_simulation_template02(@b_spline_pulse,@b_spline_pulse_derivative)
+%string_simulation_template02(@triangle_pulse,@triangle_pulse_derivative)
+%string_simulation_template02(@b_spline_pulse,@b_spline_pulse_derivative)
 
 function string_simulation_template02(wave_func_in,wave_func_derivative)
     num_masses = 300;
@@ -40,8 +126,19 @@ function string_simulation_template02(wave_func_in,wave_func_derivative)
     
     [tlist,Vlist, ~, ~] = explicit_RK_fixed_step_integration ...
     (my_rate_func,tspan,V0,h_ref,ralston_struct);
+    
+    mypath1 = 'C:\Users\ldao\Downloads\';
+    fname='mode_1_vibration.avi';
+    input_fname = [mypath1,fname];
+    
+    % create a videowriter, which will write frames to the animation file
+    writerObj = VideoWriter(input_fname);
+    
+    % must call open before writing any frames
+    open(writerObj);
+    
+    fig1 = figure(1);
 
-    figure(1);
     axis manual;
     for i = 1:length(tlist)
 %         for mass_num = 1:length(Vlist(1,:))/2
@@ -64,13 +161,17 @@ function string_simulation_template02(wave_func_in,wave_func_derivative)
             position_of_masses_all = [0, position_of_masses, Uf_func(tlist(i))];
             hold on;
             plot(x_pos_all,position_of_masses_all,"b-");
-;
-%         end
+            title("Traveling Wave (Triangle)")
+            xlabel("x")
+            ylabel("u")
+            drawnow;
+        current_frame = getframe(fig1);
+        writeVideo(writerObj,current_frame)
         pause(0.001);
         clf;
     end
 end
-
+%close(writerObj);
 %% explicit_RK fixed_step integrator
 %Runs numerical integration arbitrary RK method
 %INPUTS:
